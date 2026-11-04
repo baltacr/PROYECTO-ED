@@ -1,0 +1,5 @@
+# Ignorar archivos .class individuales
+*.class
+
+# Ignorar la carpeta bin completa (donde VS Code guarda los compilados)
+bin/
