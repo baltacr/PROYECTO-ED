@@ -183,7 +183,7 @@ public class MotorDeliberacion {
         } catch (InvalidKeyException | InvalidPositionException e) {
         throw new IllegalStateException("Error al eliminar el posteo: " + e.getMessage());
         }
-    }|
+    }
 
     //obtiene las posiciones en postorden.
     private void obtenerIdsYPosicionesSubarbol(Position<Opinion> nodo, PositionList<String> ids, PositionList<Position<Opinion>> posiciones) {
@@ -198,21 +198,27 @@ public class MotorDeliberacion {
     //limpia todo el debate, dejando la estructura vacía.   
     public void clearDebate() {
     //TODO: Implementar la funcionalidad de limpiar todo el debate, dejando la estructura vacía.
+        
+        arbol = new Arbol<>();
+        mapeoUsuario = new MapeoConHashAbierto<>();
+        mapeoPosteos = new MapeoConHashAbierto<>();
+        operaciones=new pilaConArreglo<>();
     }
 
     //consultar por usuario, devuelve una lista de argumentos que pertenecen a ese usuario.
     public PositionList<Opinion> consultarArgumentosPorUsuario(String idUsuario) {
     //TODO: Implementar la funcionalidad de consultar los argumentos de un usuario específico en el debate.
-        PositionList<Opinion> lista = new LDE<Opinion>();
-        if(idUsuario != null){
-            for(Position<Opinion> posicion : arbol.positions()){
-                Opinion opinion = posicion.element();
-                if(opinion != null && opinion.getUsuario().equals(idUsuario)){
-                    lista.addLast(opinion);
-                }
+        if(idUsuario == null){
+            return new LDE<Opinion>();
+       }
+       try{
+            PositionList<Opinion> argumentos = mapeoUsuario.get(idUsuario);
+            if(argumentos != null){
+                return argumentos;
             }
-        }
-        return lista;
+       }catch(InvalidKeyException e){
+       }
+       return new LDE<Opinion>();
     }   
 
     /**
@@ -224,6 +230,7 @@ public class MotorDeliberacion {
      */
     public diccionarioConHashAbierto<String,diccionarioConHashAbierto<String,Integer>> calcularPolarizacionDebate(){
         //TODO
+        
     }
 
      /**
