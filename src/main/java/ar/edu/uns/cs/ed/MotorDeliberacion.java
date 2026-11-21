@@ -203,7 +203,17 @@ public class MotorDeliberacion {
     //consultar por usuario, devuelve una lista de argumentos que pertenecen a ese usuario.
     public PositionList<Opinion> consultarArgumentosPorUsuario(String idUsuario) {
     //TODO: Implementar la funcionalidad de consultar los argumentos de un usuario específico en el debate.
-    }
+        PositionList<Opinion> lista = new LDE<Opinion>();
+        if(idUsuario != null){
+            for(Position<Opinion> posicion : arbol.positions()){
+                Opinion opinion = posicion.element();
+                if(opinion != null && opinion.getUsuario().equals(idUsuario)){
+                    lista.addLast(opinion);
+                }
+            }
+        }
+        return lista;
+    }   
 
     /**
      * Calcula la polarización de todos los nodos del debate.
