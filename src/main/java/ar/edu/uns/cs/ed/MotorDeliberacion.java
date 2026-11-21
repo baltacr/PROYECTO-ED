@@ -58,16 +58,12 @@ public class MotorDeliberacion {
      */
     public void registrarOperacion(int operacion, String detalle, String idArgumento){
         //TODO: Implementar el registro de la operación en la estructura correspondiente.
-        if(operacion!=1||operacion!=2){
+        if (operacion != 1 && operacion != 2) {
             throw new IllegalArgumentException("Operación no válida");
         }
-        if (detalle == null || detalle.trim().isEmpty()) {
-            throw new IllegalArgumentException("El detalle no puede ser nulo o vacío");
-        }
-        if (idArgumento == null || idArgumento.trim().isEmpty()) {
-            throw new IllegalArgumentException("El id no puede ser nulo o vacío");
-        }
-        
+
+        String detalleNormalizado = detalle.trim().toUpperCase();
+        operaciones.push(new Operaciones(operacion, detalleNormalizado, idArgumento.trim()));
     }
 
 /**
