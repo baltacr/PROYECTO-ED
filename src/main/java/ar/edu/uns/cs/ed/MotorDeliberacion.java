@@ -135,44 +135,16 @@ public class MotorDeliberacion {
 
         mapeoPosteos.put(idRaiz,arbol.root());
         
-        // registrando la operacion en el historial en -operaciones-
+        // registrando la operacion en el "historial"
 
         registrarOperacion(1, "CREAR DEBATE" + idRaiz.trim(), idRaiz);
     }
 
     public void Postear(Usuario usr, String idNuevo, String idPadre, String postura, String texto) {
-
-        Position<Opinion> padre = mapeoPosteos.get(idPadre);
-        Position<Opinion> nuevo = mapeoPosteos.get(idNuevo);
-
-        //Reviso si la opinión padre -idPadre- ya existe | reviso si la opinión nueva -idNueva- ya existe
-        if(padre == null){throw new IllegalArgumentException("No existe el posteo padre: " + idPadre);}
-        if(nuevo != null){throw new IllegalArgumentException("el ID del nuevo posteo ya está en uso: " + idNuevo);}
-
-        //Creo la opinión nueva
-        Opinion nueva = new Opinion(idNuevo, texto, postura, usr);
-
-        //Guardo la posición en el árbol de la opinión nueva
-        Position<Opinion> posNueva = arbol.addLastChild(padre, nueva);
-
-        //Registro la posición en -mapeoPosteos-
-        mapeoPosteos.put(idNuevo,posNueva);
-
-        //Agrego la opinión a la lista de opiniones del usuario en -mapeoUsuario- (si no tiene tal lista la creamos)
-        String claveUsuario = usr.getId();
-        PositionList<Opinion> opiniones = mapeoUsuario.get(claveUsuario);
-        
-        if(opiniones == null){
-            opiniones = new LDE<>();
-            mapeoUsuario.put(claveUsuario, opiniones);
-        } 
-
-        opiniones.addLast(nueva);
-
-        //registrando la operación en el historial en -operaciones-
-        registrarOperacion(2, "POSTEAR: " + idNuevo, idNuevo);
-    }   
+        //TODO: Implementar la funcionalidad de postear un nuevo argumento en el debate.
+    }
     
+
     // Elimina un posteo y todo el subárbol.
     public void eliminarPosteo(String idUsuario, String idPosteo) {
     //TODO: Implementar la funcionalidad de eliminar un posteo y todo su subárbol en el debate.
@@ -181,17 +153,38 @@ public class MotorDeliberacion {
     //obtiene las posiciones en postorden.
     private void obtenerIdsYPosicionesSubarbol(Position<Opinion> nodo, PositionList<String> ids, PositionList<Position<Opinion>> posiciones) {
     //TODO: Implementar la funcionalidad de obtener los ids y posiciones de un subárbol en postorden.
+        for (Position<Opinion> hijo : arbol.children(nodo)) {
+            obtenerIdsYPosicionesSubarbol(hijo, ids, posiciones);
+        }
+        ids.addLast(nodo.element().getIdArgumento());
+        posiciones.addLast(nodo);
     }
 
     //limpia todo el debate, dejando la estructura vacía.   
     public void clearDebate() {
     //TODO: Implementar la funcionalidad de limpiar todo el debate, dejando la estructura vacía.
+        
+        arbol = new Arbol<>();
+        mapeoUsuario = new MapeoConHashAbierto<>();
+        mapeoPosteos = new MapeoConHashAbierto<>();
+        operaciones=new pilaConArreglo<>();
     }
 
     //consultar por usuario, devuelve una lista de argumentos que pertenecen a ese usuario.
     public PositionList<Opinion> consultarArgumentosPorUsuario(String idUsuario) {
     //TODO: Implementar la funcionalidad de consultar los argumentos de un usuario específico en el debate.
-    }
+        if(idUsuario == null){
+            return new LDE<Opinion>();
+       }
+       try{
+            PositionList<Opinion> argumentos = mapeoUsuario.get(idUsuario);
+            if(argumentos != null){
+                return argumentos;
+            }
+       }catch(InvalidKeyException e){
+       }
+       return new LDE<Opinion>();
+    }   
 
     /**
      * Calcula la polarización de todos los nodos del debate.
@@ -202,6 +195,7 @@ public class MotorDeliberacion {
      */
     public diccionarioConHashAbierto<String,diccionarioConHashAbierto<String,Integer>> calcularPolarizacionDebate(){
         //TODO
+        
     }
 
      /**
