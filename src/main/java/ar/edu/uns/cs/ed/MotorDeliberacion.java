@@ -141,14 +141,42 @@ public class MotorDeliberacion {
     }
 
     public void Postear(Usuario usr, String idNuevo, String idPadre, String postura, String texto) {
-        //TODO: Implementar la funcionalidad de postear un nuevo argumento en el debate.
+
+        Position<Opinion> padre = mapeoPosteos.get(idPadre);
+        Position<Opinion> nuevo = mapeoPosteos.get(idNuevo);
+
+        //Reviso si la opinión padre -idPadre- ya existe | reviso si la opinión nueva -idNueva- ya existe
+        if(padre == null){throw new IllegalArgumentException("No existe el posteo padre: " + idPadre);}
+        if(nuevo != null){throw new IllegalArgumentException("el ID del nuevo posteo ya está en uso: " + idNuevo);}
+
+        //Creo la opinión nueva
+        Opinion nueva = new Opinion(idNuevo, texto, postura, usr);
+
+        //Guardo la posición en el árbol de la opinión nueva
+        Position<Opinion> posNueva = arbol.addLastChild(padre, nueva);
+
+        //Registro la posición en -mapeoPosteos-
+        mapeoPosteos.put(idNuevo,posNueva);
+
+        //Agrego la opinión a la lista de opiniones del usuario en -mapeoUsuario- (si no tiene tal lista la creamos)
+        String claveUsuario = usr.getId();
+        PositionList<Opinion> opiniones = mapeoUsuario.get(claveUsuario);
+        
+        if(opiniones == null){
+            opiniones = new LDE<>();
+            mapeoUsuario.put(claveUsuario, opiniones);
+        } 
+
+        opiniones.addLast(nueva);
+
+        //registrando la operación en el historial en -operaciones-
+        registrarOperacion(2, "POSTEAR: " + idNuevo, idNuevo);
     }
     
-
     // Elimina un posteo y todo el subárbol.
     public void eliminarPosteo(String idUsuario, String idPosteo) {
     //TODO: Implementar la funcionalidad de eliminar un posteo y todo su subárbol en el debate.
-         if (idUsuario == null || idPosteo == null) {
+    if (idUsuario == null || idPosteo == null) {
         throw new IllegalArgumentException("El usuario y el posteo no pueden ser nulos.");
     }
     if (arbol.isEmpty()) {
