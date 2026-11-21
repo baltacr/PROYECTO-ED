@@ -1,8 +1,12 @@
-/*...*/
-
-//ahahaha
 package ar.edu.uns.cs.ed;
 
+import java.util.EmptyStackException;
+
+
+
+
+import ar.edu.uns.cs.ed.tdas.excepciones.InvalidPositionException;
+import ar.edu.uns.cs.ed.tdas.tdalista.PositionList;
 import ar.edu.uns.cs.ed.tdas.excepciones.*;
 import ar.edu.uns.cs.ed.tdas.tdalista.*;
 import ar.edu.uns.cs.ed.tdas.tdamapeo.*;
@@ -20,15 +24,14 @@ import ar.edu.uns.cs.ed.tdas.tdapila.*;
  * 
  */
 public class MotorDeliberacion {
-
+    
+    /**
+     * Incluir los atributos necesarios para el desarrollo.
+     */
     private Arbol<Opinion> arbol;
     private MapeoConHashAbierto<String,PositionList<Opinion>> mapeoUsuario;
     private MapeoConHashAbierto<String,Position<Opinion>> mapeoPosteos;
     private Stack<Operaciones> operaciones;
-
-    /**
-     * Incluir los atributos necesarios para el desarrollo.
-     */
 
     /**
      * Constructor de la clase MotorDeliveracion.
@@ -40,6 +43,7 @@ public class MotorDeliberacion {
         mapeoUsuario = new MapeoConHashAbierto<>();
         mapeoPosteos = new MapeoConHashAbierto<>();
         operaciones = new pilaConArreglo<>();
+    //TODO: Inicializar el árbol de debate y las estructuras correspondientes. 
     }
 
     /**
@@ -67,7 +71,6 @@ public class MotorDeliberacion {
     public String deshacerUltimaOperacion() throws EmptyStackException {
         //TODO: Implementar la funcionalidad de deshacer la última operación registrada.
     }
-
 /**
  * Crea un nuevo debate con un argumento raíz.
  * @param idRaiz   : Identificador único del tema raíz.
@@ -83,7 +86,7 @@ public class MotorDeliberacion {
  * Crea un usuario y un tema raíz, y los agrega al árbol y a las estructuras correspondientes.
  */
     public void crearDebate(String idRaiz, String texto, String idUsuario, String nombreUsuario) {
-        
+    //TODO: Implementar la creación del debate con el argumento raíz y el usuario correspondiente.
         if(idRaiz == null || texto == null || idUsuario == null || nombreUsuario == null) {
             throw new IllegalArgumentException("Alguno de los parámetros es nulo");
         }
@@ -118,7 +121,6 @@ public class MotorDeliberacion {
 
     public void Postear(Usuario usr, String idNuevo, String idPadre, String postura, String texto) {
         //TODO: Implementar la funcionalidad de postear un nuevo argumento en el debate.
-    
     }
     
 
@@ -142,6 +144,28 @@ public class MotorDeliberacion {
     //TODO: Implementar la funcionalidad de consultar los argumentos de un usuario específico en el debate.
     }
 
+    /**
+     * Calcula la polarización de todos los nodos del debate.
+     * La polarización se define como la cantidad de argumentos a favor y en contra que existen en el subárbol que tiene como raíz cada nodo.
+     * @throws IllegalStateException si no hay un debate activo.
+     * @return Un diccionario cuya clave es el ID del nodo y el valor es un diccionario con la polarización: 
+     * "AFAVOR" y "ENCONTRA" y sus respectivos conteos.
+     */
+    public diccionarioConHashAbierto<String,diccionarioConHashAbierto<String,Integer>> calcularPolarizacionDebate(){
+        //TODO
+    }
+
+     /**
+    * Calcula la polarización de un nodo específico en el árbol de debate.
+    * La polarización se define como la cantidad de argumentos a favor y en contra que existen en el subárbol que tiene como raíz el nodo especificado por idNodo.
+    * @throws IllegalStateException si no hay un debate activo. 
+    * @param idNodo : Identificador del nodo para el cual se desea calcular la polarización.
+    * @return Un diccionarioConHashAbierto<String,Integer> que contiene la polarización del nodo, con las claves "AFAVOR" y "ENCONTRA" y sus respectivos conteos.
+    */
+    public diccionarioConHashAbierto<String,Integer> calcularPolarizacionNodo(String idNodo){
+        //TODO
+
+    }
  /*** Mostrar árbol por consola ***/
  
     /**
