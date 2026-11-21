@@ -1,12 +1,5 @@
 package ar.edu.uns.cs.ed;
 
-import java.util.EmptyStackException;
-
-
-
-
-import ar.edu.uns.cs.ed.tdas.excepciones.InvalidPositionException;
-import ar.edu.uns.cs.ed.tdas.tdalista.PositionList;
 import ar.edu.uns.cs.ed.tdas.excepciones.*;
 import ar.edu.uns.cs.ed.tdas.tdalista.*;
 import ar.edu.uns.cs.ed.tdas.tdamapeo.*;
@@ -70,7 +63,29 @@ public class MotorDeliberacion {
  */
     public String deshacerUltimaOperacion() throws EmptyStackException {
         //TODO: Implementar la funcionalidad de deshacer la última operación registrada.
+        if(operaciones.isEmpty()){
+            throw new EmptyStackException("No hay operaciones hechas");
+        }
+        Operaciones ultimaOp = operaciones.pop();
+        int tipo = ultimaOp.getOperacion();
+        String idPosteo = ultimaOp.getId();
+        String toRet = "";
+
+        Position<Opinion> posicion = mapeoPosteos.remove(idPosteo);
+        if(posicion == null){
+            toRet = "No se puedo deshacer: el posteo " + idPosteo + " ya no existe.";
+        }else{
+            arbol.removeNode(posicion);
+            if(tipo == 1){
+                toRet = "Se deshizo la creacion del debate: " + idPosteo;
+            }else if (tipo == 2){
+                toRet = "Se deshizo el posteo: " + idPosteo;
+            }
+        }
+        return toRet;
     }
+        
+        
 /**
  * Crea un nuevo debate con un argumento raíz.
  * @param idRaiz   : Identificador único del tema raíz.
