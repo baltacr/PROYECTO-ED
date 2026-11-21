@@ -6,8 +6,6 @@ import java.util.EmptyStackException;
 
 
 import ar.edu.uns.cs.ed.tdas.excepciones.InvalidPositionException;
-import ar.edu.uns.cs.ed.tdas.tdalista.PositionList;
-import ar.edu.uns.cs.ed.tdas.excepciones.*;
 import ar.edu.uns.cs.ed.tdas.tdalista.*;
 import ar.edu.uns.cs.ed.tdas.tdamapeo.*;
 import ar.edu.uns.cs.ed.tdas.Position;
@@ -58,8 +56,18 @@ public class MotorDeliberacion {
      * @param idArgumento : Identificador del argumento o de root en caso de ser el tema raíz.
      * @throws IllegalArgumentException si la operación es nula o vacía.
      */
-    public void registrarOperacion(int operacion, String detalle, String idArgumento) {
+    public void registrarOperacion(int operacion, String detalle, String idArgumento){
         //TODO: Implementar el registro de la operación en la estructura correspondiente.
+        if(operacion!=1||operacion!=2){
+            throw new IllegalArgumentException("Operación no válida");
+        }
+        if (detalle == null || detalle.trim().isEmpty()) {
+            throw new IllegalArgumentException("El detalle no puede ser nulo o vacío");
+        }
+        if (idArgumento == null || idArgumento.trim().isEmpty()) {
+            throw new IllegalArgumentException("El id no puede ser nulo o vacío");
+        }
+        
     }
 
 /**
