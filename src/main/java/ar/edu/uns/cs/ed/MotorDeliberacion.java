@@ -148,41 +148,6 @@ public class MotorDeliberacion {
     // Elimina un posteo y todo el subárbol.
     public void eliminarPosteo(String idUsuario, String idPosteo) {
     //TODO: Implementar la funcionalidad de eliminar un posteo y todo su subárbol en el debate.
-         if (idUsuario == null || idPosteo == null) {
-        throw new IllegalArgumentException("El usuario y el posteo no pueden ser nulos.");
-    }
-    if (arbol.isEmpty()) {
-        throw new IllegalStateException("No hay un debate activo.");
-    }
-    try{
-     Position<Opinion> raizSubarbol = mapeoPosteos.get(idPosteo);
-        if (raizSubarbol == null) {
-            throw new IllegalArgumentException("El posteo no existe.");}
-        if (!raizSubarbol.element().getUsuario().getId().equals(idUsuario)) {
-            throw new IllegalArgumentException("El usuario no tiene permiso para eliminar este posteo.");
-        }
-        PositionList<String> ids = new LDE<>();
-        PositionList<Position<Opinion>> nodos = new LDE<>();
-        obtenerIdsYPosicionesSubarbol(raizSubarbol, ids, nodos);
-        for (Position<Opinion> nodo : nodos) {
-            Opinion op = nodo.element();
-
-            mapeoPosteos.remove(op.getIdArgumento());
-
-            PositionList<Opinion> listaUsuario = mapeoUsuario.get(op.getUsuario().getId());
-            if (listaUsuario != null) {
-                 for (Position<Opinion> p : listaUsuario.positions()) {
-                if (p.element() == op) {
-                listaUsuario.remove(p);
-                return;}
-            }
-
-                arbol.removeNode(nodo);
-            }
-        }
-        } catch (InvalidKeyException | InvalidPositionException e) {
-        throw new IllegalStateException("Error al eliminar el posteo: " + e.getMessage());
-        }
     }
 
     //obtiene las posiciones en postorden.
