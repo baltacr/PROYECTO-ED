@@ -51,8 +51,14 @@ public class MotorDeliberacion {
      * @param idArgumento : Identificador del argumento o de root en caso de ser el tema raíz.
      * @throws IllegalArgumentException si la operación es nula o vacía.
      */
-    public void registrarOperacion(int operacion, String detalle, String idArgumento) {
+    public void registrarOperacion(int operacion, String detalle, String idArgumento){
         //TODO: Implementar el registro de la operación en la estructura correspondiente.
+        if (operacion != 1 && operacion != 2) {
+            throw new IllegalArgumentException("Operación no válida");
+        }
+
+        String detalleNormalizado = detalle.trim().toUpperCase();
+        operaciones.push(new Operaciones(operacion, detalleNormalizado, idArgumento.trim()));
     }
 
 /**
