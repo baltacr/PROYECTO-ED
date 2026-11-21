@@ -181,17 +181,38 @@ public class MotorDeliberacion {
     //obtiene las posiciones en postorden.
     private void obtenerIdsYPosicionesSubarbol(Position<Opinion> nodo, PositionList<String> ids, PositionList<Position<Opinion>> posiciones) {
     //TODO: Implementar la funcionalidad de obtener los ids y posiciones de un subárbol en postorden.
+        for (Position<Opinion> hijo : arbol.children(nodo)) {
+            obtenerIdsYPosicionesSubarbol(hijo, ids, posiciones);
+        }
+        ids.addLast(nodo.element().getIdArgumento());
+        posiciones.addLast(nodo);
     }
 
     //limpia todo el debate, dejando la estructura vacía.   
     public void clearDebate() {
     //TODO: Implementar la funcionalidad de limpiar todo el debate, dejando la estructura vacía.
+        
+        arbol = new Arbol<>();
+        mapeoUsuario = new MapeoConHashAbierto<>();
+        mapeoPosteos = new MapeoConHashAbierto<>();
+        operaciones=new pilaConArreglo<>();
     }
 
     //consultar por usuario, devuelve una lista de argumentos que pertenecen a ese usuario.
     public PositionList<Opinion> consultarArgumentosPorUsuario(String idUsuario) {
     //TODO: Implementar la funcionalidad de consultar los argumentos de un usuario específico en el debate.
-    }
+        if(idUsuario == null){
+            return new LDE<Opinion>();
+       }
+       try{
+            PositionList<Opinion> argumentos = mapeoUsuario.get(idUsuario);
+            if(argumentos != null){
+                return argumentos;
+            }
+       }catch(InvalidKeyException e){
+       }
+       return new LDE<Opinion>();
+    }   
 
     /**
      * Calcula la polarización de todos los nodos del debate.
@@ -202,6 +223,7 @@ public class MotorDeliberacion {
      */
     public diccionarioConHashAbierto<String,diccionarioConHashAbierto<String,Integer>> calcularPolarizacionDebate(){
         //TODO
+        
     }
 
      /**
