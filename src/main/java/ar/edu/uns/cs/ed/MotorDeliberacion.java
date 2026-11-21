@@ -230,7 +230,7 @@ public class MotorDeliberacion {
      */
     public diccionarioConHashAbierto<String,diccionarioConHashAbierto<String,Integer>> calcularPolarizacionDebate(){
         //TODO
-        
+
     }
 
      /**
@@ -242,6 +242,51 @@ public class MotorDeliberacion {
     */
     public diccionarioConHashAbierto<String,Integer> calcularPolarizacionNodo(String idNodo){
         //TODO
+        if (arbol.isEmpty()) {
+        throw new IllegalStateException("No hay un debate activo.");
+    }
+    if (idNodo == null) {
+        throw new IllegalArgumentException("El id del nodo no puede ser nulo.");
+    }
+    try {
+        Position<Opinion> nodo = mapeoPosteos.get(idNodo);
+        if (nodo == null) {
+            throw new IllegalArgumentException("El nodo no existe.");
+        }
+
+        int aFavor = 0;
+        int enContra = 0;
+
+        // Pila de nodos pendientes de visitar
+        PositionList<Position<Opinion>> pendientes = new LDE<>();
+        pendientes.addLast(nodo);
+
+        while (!pendientes.isEmpty()) {
+            // sacar el último (comportamiento de pila)
+            Position<Position<Opinion>> ultima = pendientes.last();
+            Position<Opinion> actual = ultima.element();
+            pendientes.remove(ultima);
+
+            String postura = actual.element().getPostura();
+            if (postura.equals("A FAVOR")) {
+                aFavor++;
+            } else if (postura.equals("EN CONTRA")) {
+                enContra++;
+            }
+
+            // agregar los hijos para visitarlos después
+            for (Position<Opinion> hijo : arbol.children(actual)) {
+                pendientes.addLast(hijo);
+            }
+        }
+
+        diccionarioConHashAbierto<String, Integer> resultado = new diccionarioConHashAbierto<>();
+        resultado.insert("AFAVOR", aFavor);
+        resultado.insert("ENCONTRA", enContra);
+        return resultado;
+    } catch (InvalidKeyException | InvalidPositionException e) {
+        throw new IllegalStateException("Error al calcular la polarización: " + e.getMessage());
+    }
 
     }
  /*** Mostrar árbol por consola ***/
