@@ -121,38 +121,20 @@ public class MotorDeliberacion {
  */
     public void crearDebate(String idRaiz, String texto, String idUsuario, String nombreUsuario) throws IllegalArgumentException, IllegalStateException{
     //TODO: Implementar la creación del debate con el argumento raíz y el usuario correspondiente.
-       if (idRaiz == null || idRaiz.trim().isEmpty()
-        || texto == null || texto.trim().isEmpty()
-        || idUsuario == null || idUsuario.trim().isEmpty()
-        || nombreUsuario == null || nombreUsuario.trim().isEmpty()) {
-    throw new IllegalArgumentException("Alguno de los parámetros es nulo o vacío");
-}
+        if (idRaiz == null || idRaiz.trim().isEmpty() || texto == null || texto.trim().isEmpty() || idUsuario == null || idUsuario.trim().isEmpty() || nombreUsuario == null || nombreUsuario.trim().isEmpty()) {
+            throw new IllegalArgumentException("Alguno de los parámetros es nulo o vacío");
+        } 
 
         if(!arbol.isEmpty()){
             throw new IllegalStateException("El árbol ya tiene un debate");
         }
-
-        //creando tema de debate
-
         Usuario user = new Usuario (idUsuario, nombreUsuario);
         Opinion raizOp = new Opinion (idRaiz,texto,"ROOT",user);
         arbol.createRoot(raizOp);
-
-        //1) agregando opinion inicio de debate del usuario a su lista de posteos
-        //2) agreando id con la lista de posteos del usuario al mapeo.
-        // mapeo de usarios --> posteos
-        
         PositionList<Opinion> posteosUser = new LDE<>();
         posteosUser.addLast(raizOp);
         mapeoUsuario.put(idUsuario,posteosUser);
-
-        // agregando la posicion de la opinion en el arbol al mapeo.
-        // mapeo de posteos --> posicion en el árbol
-
         mapeoPosteos.put(idRaiz,arbol.root());
-        
-        // registrando la operacion en el "historial"
-
         registrarOperacion(1, "CREAR DEBATE" + idRaiz.trim(), idRaiz);
     }
 
@@ -162,43 +144,26 @@ public class MotorDeliberacion {
         }
         Position<Opinion> padre = mapeoPosteos.get(idPadre);
         Position<Opinion> nuevo = mapeoPosteos.get(idNuevo);
-
         //Reviso si la opinión padre -idPadre- ya existe | reviso si la opinión nueva -idNueva- ya existe
         if(padre == null){throw new IllegalArgumentException("No existe el posteo padre: " + idPadre);}
         if(nuevo != null){throw new IllegalArgumentException("el ID del nuevo posteo ya está en uso: " + idNuevo);}
-
-        
-        if (usr == null || idNuevo == null || idNuevo.trim().isEmpty()
-            || idPadre == null || idPadre.trim().isEmpty()
-            || postura == null || texto == null || texto.trim().isEmpty()) {
-    throw new IllegalArgumentException("Parámetros inválidos.");
-}
-String posturaNorm = postura.trim().toUpperCase();
-if (!posturaNorm.equals("AFAVOR") && !posturaNorm.equals("ENCONTRA")) {
-    throw new IllegalArgumentException("Postura inválida: " + postura);
-}
-
-        //Creo la opinión nueva
+        if (usr == null || idNuevo == null || idNuevo.trim().isEmpty()|| idPadre == null || idPadre.trim().isEmpty() || postura == null || texto == null || texto.trim().isEmpty()) {
+            throw new IllegalArgumentException("Parámetros inválidos.");
+        }
+        String posturaNorm = postura.trim().toUpperCase();
+        if (!posturaNorm.equals("AFAVOR") && !posturaNorm.equals("ENCONTRA")) {
+            throw new IllegalArgumentException("Postura inválida: " + postura);
+        }
         Opinion nueva = new Opinion(idNuevo, texto, postura, usr);
-
-        //Guardo la posición en el árbol de la opinión nueva
         Position<Opinion> posNueva = arbol.addLastChild(padre, nueva);
-
-        //Registro la posición en -mapeoPosteos-
         mapeoPosteos.put(idNuevo,posNueva);
-
-        //Agrego la opinión a la lista de opiniones del usuario en -mapeoUsuario- (si no tiene tal lista la creamos)
         String claveUsuario = usr.getId();
         PositionList<Opinion> opiniones = mapeoUsuario.get(claveUsuario);
-        
         if(opiniones == null){
             opiniones = new LDE<>();
             mapeoUsuario.put(claveUsuario, opiniones);
         } 
-
         opiniones.addLast(nueva);
-
-        //registrando la operación en el historial en -operaciones-
         registrarOperacion(2, "POSTEAR: " + idNuevo, idNuevo);
     }
     
@@ -212,7 +177,7 @@ if (!posturaNorm.equals("AFAVOR") && !posturaNorm.equals("ENCONTRA")) {
         throw new IllegalStateException("No hay un debate activo.");
     }
     try{
-     Position<Opinion> raizSubarbol = mapeoPosteos.get(idPosteo);
+        Position<Opinion> raizSubarbol = mapeoPosteos.get(idPosteo);
         if (raizSubarbol == null) {
             throw new IllegalArgumentException("El posteo no existe.");}
         if (!raizSubarbol.element().getUsuario().getId().equals(idUsuario)) {
@@ -223,18 +188,15 @@ if (!posturaNorm.equals("AFAVOR") && !posturaNorm.equals("ENCONTRA")) {
         obtenerIdsYPosicionesSubarbol(raizSubarbol, ids, nodos);
         for (Position<Opinion> nodo : nodos) {
             Opinion op = nodo.element();
-
             mapeoPosteos.remove(op.getIdArgumento());
-
             PositionList<Opinion> listaUsuario = mapeoUsuario.get(op.getUsuario().getId());
             if (listaUsuario != null) {
                  for (Position<Opinion> p : listaUsuario.positions()) {
                     if (p.element() == op) {
                         listaUsuario.remove(p);
                         break;
+                    }
                 }
-            }
-
                 arbol.removeNode(nodo);
             }
         }
@@ -256,11 +218,10 @@ if (!posturaNorm.equals("AFAVOR") && !posturaNorm.equals("ENCONTRA")) {
     //limpia todo el debate, dejando la estructura vacía.   
     public void clearDebate() {
     //TODO: Implementar la funcionalidad de limpiar todo el debate, dejando la estructura vacía.
-        
         arbol = new Arbol<>();
         mapeoUsuario = new MapeoConHashAbierto<>();
         mapeoPosteos = new MapeoConHashAbierto<>();
-        operaciones=new pilaConArreglo<>();
+        operaciones= new pilaConArreglo<>();
     }
 
     //consultar por usuario, devuelve una lista de argumentos que pertenecen a ese usuario.
