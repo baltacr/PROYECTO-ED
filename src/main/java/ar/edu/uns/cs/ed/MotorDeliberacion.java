@@ -1,3 +1,7 @@
+
+/**
+ * Incluir los import necesarios para las clases utilizadas en el código.
+ */
 package ar.edu.uns.cs.ed;
 
 import ar.edu.uns.cs.ed.tdas.excepciones.*;
@@ -7,11 +11,6 @@ import ar.edu.uns.cs.ed.tdas.Position;
 import ar.edu.uns.cs.ed.tdas.tdaarbol.*;
 import ar.edu.uns.cs.ed.tdas.tdadiccionario.diccionarioConHashAbierto;
 import ar.edu.uns.cs.ed.tdas.tdapila.*;
-
-/**
- * Incluir los import necesarios para las clases utilizadas en el código.
- */
-
 /**
  * Clase que representa el motor de deliveración.
  * 
@@ -144,7 +143,6 @@ public class MotorDeliberacion {
         }
         Position<Opinion> padre = mapeoPosteos.get(idPadre);
         Position<Opinion> nuevo = mapeoPosteos.get(idNuevo);
-        //Reviso si la opinión padre -idPadre- ya existe | reviso si la opinión nueva -idNueva- ya existe
         if(padre == null){throw new IllegalArgumentException("No existe el posteo padre: " + idPadre);}
         if(nuevo != null){throw new IllegalArgumentException("el ID del nuevo posteo ya está en uso: " + idNuevo);}
         if (usr == null || idNuevo == null || idNuevo.trim().isEmpty()|| idPadre == null || idPadre.trim().isEmpty() || postura == null || texto == null || texto.trim().isEmpty()) {
@@ -302,12 +300,11 @@ public class MotorDeliberacion {
         int aFavor = 0;
         int enContra = 0;
 
-        // Pila de nodos pendientes de visitar
         PositionList<Position<Opinion>> pendientes = new LDE<>();
         pendientes.addLast(nodo);
 
         while (!pendientes.isEmpty()) {
-            // sacar el último (comportamiento de pila)
+
             Position<Position<Opinion>> ultima = pendientes.last();
             Position<Opinion> actual = ultima.element();
             pendientes.remove(ultima);
@@ -319,7 +316,6 @@ public class MotorDeliberacion {
                 enContra++;
             }
 
-            // agregar los hijos para visitarlos después
             for (Position<Opinion> hijo : arbol.children(actual)) {
                 pendientes.addLast(hijo);
             }
