@@ -51,7 +51,7 @@ public class MotorDeliberacion {
      * @param idArgumento : Identificador del argumento o de root en caso de ser el tema raíz.
      * @throws IllegalArgumentException si la operación es nula o vacía.
      */
-    public void registrarOperacion(int operacion, String detalle, String idArgumento){
+    public void registrarOperacion(int operacion, String detalle, String idArgumento) throws IllegalStateException{
         //TODO: Implementar el registro de la operación en la estructura correspondiente.
         if (operacion != 1 && operacion != 2) {
             throw new IllegalArgumentException("Operación no válida");
@@ -106,7 +106,7 @@ public class MotorDeliberacion {
  * @throws IllegalStateException si ya existe un debate en curso.
  * Crea un usuario y un tema raíz, y los agrega al árbol y a las estructuras correspondientes.
  */
-    public void crearDebate(String idRaiz, String texto, String idUsuario, String nombreUsuario) {
+    public void crearDebate(String idRaiz, String texto, String idUsuario, String nombreUsuario) throws IllegalArgumentException, IllegalStateException{
     //TODO: Implementar la creación del debate con el argumento raíz y el usuario correspondiente.
         if(idRaiz == null || texto == null || idUsuario == null || nombreUsuario == null) {
             throw new IllegalArgumentException("Alguno de los parámetros es nulo");
@@ -256,9 +256,35 @@ public class MotorDeliberacion {
      * @return Un diccionario cuya clave es el ID del nodo y el valor es un diccionario con la polarización: 
      * "AFAVOR" y "ENCONTRA" y sus respectivos conteos.
      */
-    public diccionarioConHashAbierto<String,diccionarioConHashAbierto<String,Integer>> calcularPolarizacionDebate(){
+    public diccionarioConHashAbierto<String,diccionarioConHashAbierto<String,Integer>> calcularPolarizacionDebate() throws IllegalStateException{
         //TODO
-
+        if(arbol.isEmpty()){
+            throw new IllegalStateException("No hay debate activo");
+        }
+        diccionarioConHashAbierto<String, diccionarioConHashAbierto<String,Integer>> calculo = new diccionarioConHashAbierto<>();
+        calcularPolarizacion(arbol.root(), calculo);
+        return calculo;
+    }
+    private void calcularPolarizacion(Position<Opinion> posicion, diccionarioConHashAbierto<String, diccionarioConHashAbierto<String,Integer>> calculo){
+        int aFavor = contarPostura(posicion, "AFAVOR");
+        int enContra = contarPostura(posicion, "ENCONTRA");
+        diccionarioConHashAbierto<String,Integer> polarizacion = new diccionarioConHashAbierto<>();
+        polarizacion.insert("AFAVOR", aFavor);
+        polarizacion.insert("ENCONTRA", enContra);
+        calculo.insert(posicion.element().getIdArgumento(), polarizacion);
+        for(Position<Opinion> hijo : arbol.children(posicion)){
+            calcularPolarizacion(hijo, calculo);
+        }
+    }
+    private int contarPostura(Position<Opinion> nodo, String postura){
+        int total = 0;
+        if(nodo != arbol.root() && postura.equals(nodo.element().getPostura())){
+            total = 1;
+        }
+        for(Position<Opinion> hijo : arbol.children(nodo)){
+            total = total + contarPostura(hijo, postura);
+        }
+        return total;
     }
 
      /**
@@ -268,7 +294,7 @@ public class MotorDeliberacion {
     * @param idNodo : Identificador del nodo para el cual se desea calcular la polarización.
     * @return Un diccionarioConHashAbierto<String,Integer> que contiene la polarización del nodo, con las claves "AFAVOR" y "ENCONTRA" y sus respectivos conteos.
     */
-    public diccionarioConHashAbierto<String,Integer> calcularPolarizacionNodo(String idNodo){
+    public diccionarioConHashAbierto<String,Integer> calcularPolarizacionNodo(String idNodo) throws IllegalStateException{
         //TODO
         if (arbol.isEmpty()) {
         throw new IllegalStateException("No hay un debate activo.");
