@@ -18,7 +18,7 @@ public class MapeoConHashAbierto<K,V> implements Map<K,V> {
     }
 
     private int hash(K key) {
-        return (key.hashCode() % N);
+        return Math.abs(key.hashCode() % N);
     }
 
     public int size() { 

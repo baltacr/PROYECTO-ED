@@ -19,7 +19,7 @@ public class diccionarioConHashAbierto<K,V> implements Dictionary<K,V> {
     }
 
     private int hash(K key) {
-    return (key.hashCode()) % N;
+    return Math.abs(key.hashCode()) % N;
 }
 
     public int size() { 

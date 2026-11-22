@@ -68,28 +68,41 @@ public class MotorDeliberacion {
  * @throws EmptyStackException
  */
     public String deshacerUltimaOperacion() throws EmptyStackException {
-        //TODO: Implementar la funcionalidad de deshacer la última operación registrada.
-        if(operaciones.isEmpty()){
-            throw new EmptyStackException("No hay operaciones hechas");
-        }
-        Operaciones ultimaOp = operaciones.pop();
-        int tipo = ultimaOp.getOperacion();
-        String idPosteo = ultimaOp.getId();
-        String toRet = "";
+    if (operaciones.isEmpty()) {
+        throw new EmptyStackException("No hay operaciones hechas");
+    }
+    Operaciones ultimaOp = operaciones.pop();
+    int tipo = ultimaOp.getOperacion();
+    String idPosteo = ultimaOp.getId();
+    String toRet = "";
 
+    try {
         Position<Opinion> posicion = mapeoPosteos.remove(idPosteo);
-        if(posicion == null){
-            toRet = "No se puedo deshacer: el posteo " + idPosteo + " ya no existe.";
-        }else{
+        if (posicion == null) {
+            throw new IllegalStateException("No se pudo deshacer la operación POSTEAR: el posteo " + idPosteo + " ya no existe.");
+        } else {
+            Opinion op = posicion.element();
+            PositionList<Opinion> listaUsuario = mapeoUsuario.get(op.getUsuario().getId());
+            if (listaUsuario != null) {
+                for (Position<Opinion> p : listaUsuario.positions()) {
+                    if (p.element() == op) {
+                        listaUsuario.remove(p);
+                        break;
+                    }
+                }
+            }
             arbol.removeNode(posicion);
-            if(tipo == 1){
+            if (tipo == 1) {
                 toRet = "Se deshizo la creacion del debate: " + idPosteo;
-            }else if (tipo == 2){
+            } else if (tipo == 2) {
                 toRet = "Se deshizo el posteo: " + idPosteo;
             }
         }
-        return toRet;
+    } catch (InvalidKeyException | InvalidPositionException e) {
+        throw new IllegalStateException("Error al deshacer la operación: " + e.getMessage());
     }
+    return toRet;
+}
         
         
 /**
@@ -108,9 +121,12 @@ public class MotorDeliberacion {
  */
     public void crearDebate(String idRaiz, String texto, String idUsuario, String nombreUsuario) throws IllegalArgumentException, IllegalStateException{
     //TODO: Implementar la creación del debate con el argumento raíz y el usuario correspondiente.
-        if(idRaiz == null || texto == null || idUsuario == null || nombreUsuario == null) {
-            throw new IllegalArgumentException("Alguno de los parámetros es nulo");
-        }
+       if (idRaiz == null || idRaiz.trim().isEmpty()
+        || texto == null || texto.trim().isEmpty()
+        || idUsuario == null || idUsuario.trim().isEmpty()
+        || nombreUsuario == null || nombreUsuario.trim().isEmpty()) {
+    throw new IllegalArgumentException("Alguno de los parámetros es nulo o vacío");
+}
 
         if(!arbol.isEmpty()){
             throw new IllegalStateException("El árbol ya tiene un debate");
@@ -141,13 +157,26 @@ public class MotorDeliberacion {
     }
 
     public void Postear(Usuario usr, String idNuevo, String idPadre, String postura, String texto) {
-
+        if (arbol.isEmpty()) {
+            throw new IllegalStateException("No hay debate activo.");
+        }
         Position<Opinion> padre = mapeoPosteos.get(idPadre);
         Position<Opinion> nuevo = mapeoPosteos.get(idNuevo);
 
         //Reviso si la opinión padre -idPadre- ya existe | reviso si la opinión nueva -idNueva- ya existe
         if(padre == null){throw new IllegalArgumentException("No existe el posteo padre: " + idPadre);}
         if(nuevo != null){throw new IllegalArgumentException("el ID del nuevo posteo ya está en uso: " + idNuevo);}
+
+        
+        if (usr == null || idNuevo == null || idNuevo.trim().isEmpty()
+            || idPadre == null || idPadre.trim().isEmpty()
+            || postura == null || texto == null || texto.trim().isEmpty()) {
+    throw new IllegalArgumentException("Parámetros inválidos.");
+}
+String posturaNorm = postura.trim().toUpperCase();
+if (!posturaNorm.equals("AFAVOR") && !posturaNorm.equals("ENCONTRA")) {
+    throw new IllegalArgumentException("Postura inválida: " + postura);
+}
 
         //Creo la opinión nueva
         Opinion nueva = new Opinion(idNuevo, texto, postura, usr);
@@ -176,7 +205,7 @@ public class MotorDeliberacion {
     // Elimina un posteo y todo el subárbol.
     public void eliminarPosteo(String idUsuario, String idPosteo) {
     //TODO: Implementar la funcionalidad de eliminar un posteo y todo su subárbol en el debate.
-    if (idUsuario == null || idPosteo == null) {
+    if (idUsuario == null || idUsuario.trim().isEmpty() || idPosteo == null || idPosteo.trim().isEmpty()) {
         throw new IllegalArgumentException("El usuario y el posteo no pueden ser nulos.");
     }
     if (arbol.isEmpty()) {
@@ -187,7 +216,7 @@ public class MotorDeliberacion {
         if (raizSubarbol == null) {
             throw new IllegalArgumentException("El posteo no existe.");}
         if (!raizSubarbol.element().getUsuario().getId().equals(idUsuario)) {
-            throw new IllegalArgumentException("El usuario no tiene permiso para eliminar este posteo.");
+            throw new IllegalStateException("El usuario no tiene permiso para eliminar este posteo.");
         }
         PositionList<String> ids = new LDE<>();
         PositionList<Position<Opinion>> nodos = new LDE<>();
@@ -200,9 +229,10 @@ public class MotorDeliberacion {
             PositionList<Opinion> listaUsuario = mapeoUsuario.get(op.getUsuario().getId());
             if (listaUsuario != null) {
                  for (Position<Opinion> p : listaUsuario.positions()) {
-                if (p.element() == op) {
-                listaUsuario.remove(p);
-                return;}
+                    if (p.element() == op) {
+                        listaUsuario.remove(p);
+                        break;
+                }
             }
 
                 arbol.removeNode(nodo);
@@ -234,10 +264,10 @@ public class MotorDeliberacion {
     }
 
     //consultar por usuario, devuelve una lista de argumentos que pertenecen a ese usuario.
-    public PositionList<Opinion> consultarArgumentosPorUsuario(String idUsuario) {
+    public PositionList<Opinion> consultarArgumentosPorUsuario(String idUsuario) throws IllegalArgumentException {
     //TODO: Implementar la funcionalidad de consultar los argumentos de un usuario específico en el debate.
-        if(idUsuario == null){
-            return new LDE<Opinion>();
+        if(idUsuario == null || idUsuario.trim().isEmpty()){
+            throw new IllegalArgumentException("El id de usuario no puede ser nulo o vacio");
        }
        try{
             PositionList<Opinion> argumentos = mapeoUsuario.get(idUsuario);
@@ -322,9 +352,9 @@ public class MotorDeliberacion {
             pendientes.remove(ultima);
 
             String postura = actual.element().getPostura();
-            if (postura.equals("A FAVOR")) {
+            if (postura.equals("AFAVOR")) {
                 aFavor++;
-            } else if (postura.equals("EN CONTRA")) {
+            } else if (postura.equals("ENCONTRA")) {
                 enContra++;
             }
 
