@@ -3,3 +3,4 @@
 
 # Ignorar la carpeta bin completa (donde VS Code guarda los compilados)
 bin/
+test-lib/
